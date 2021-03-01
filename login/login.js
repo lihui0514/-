@@ -74,7 +74,7 @@ $('#login form').on('submit', function (e) {
     let data = $(this).serialize();
     // 2、提交数据
     $.ajax({
-        url: 'http://ajax.frontend.itheima.net/api/login',
+        url: '/api/login',
         type: 'post',  // 类型
         data: data,//收到的数据
         // 成功的函数

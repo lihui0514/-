@@ -1,57 +1,43 @@
+
 let layer = layui.layer;
 // ----------------------获取个人信息
-$.ajax({
-    url: 'http://ajax.frontend.itheima.net/my/userinfo',
-    // type默认get可以不写
-    // 没有传参
+function getInfo() {
+    $.ajax({
+        url: '/my/userinfo',
+        // type默认get可以不写
+        // token携带去common.js
+        // token过期验证去common.js
+        // 因为除了登录和注册外,都需要请求做这两件事,这是重复代码,单独配置到js文件内进行维护
+        success: function (res) {
+            if (res.status == 0) {
+                // 产品经理设计思路：
+                //          1、名字：优先显示昵称，后则显示用户名！
+                let name = res.data.nickname || res.data.username;
+                $('.username').text(name);
 
-
-    // 设置请求头：
-    headers: {
-        // 代表当前是那个用户
-        'Authorization': localStorage.getItem("token")
-    },
-    success: function (res) {
-        if (res.status == 0) {
-            // 产品经理设计思路：
-            //          1、名字：优先显示昵称，后则显示用户名！
-            let name = res.data.nickname || res.data.username;
-            $('.username').text(name);
-
-            //          2、圆形区域：显示一个头像；有限显示一个图片，后则显示名字的第一个字
-            if (res.data.user_pic != null) {
-                // 好处：图片不是一个地址，是base64位图片流(字符串)：直接在HTML页面中渲染，减少对服务器的一个请求
-                // 弊端：处理图片流字符串，把图片大小增加原来的30%，前端HTMl加载费劲
-                // 场景：处理小图，精灵图
-                $('.userinfo img').show().attr('src', res.data.user_pic)
-            } else {
-                // 名字第一个字的截取
-                let str = name.substr(0, 1);
-                // 大写：防止第一个字是英文
-                str = str.toUpperCase();
-                // 设置
-                $('.avatar').show().css('display', 'inline-block').text(str);
-                // show方法会给DOM添加行内样式display：inline，需要单独设置css样式
+                //          2、圆形区域：显示一个头像；有限显示一个图片，后则显示名字的第一个字
+                if (res.data.user_pic != null) {
+                    // 好处：图片不是一个地址，是base64位图片流(字符串)：直接在HTML页面中渲染，减少对服务器的一个请求
+                    // 弊端：处理图片流字符串，把图片大小增加原来的30%，前端HTMl加载费劲
+                    // 场景：处理小图，精灵图
+                    $('.userinfo img').show().attr('src', res.data.user_pic)
+                } else {
+                    // 名字第一个字的截取
+                    let str = name.substr(0, 1);
+                    // 大写：防止第一个字是英文
+                    str = str.toUpperCase();
+                    // 设置
+                    $('.avatar').show().css('display', 'inline-block').text(str);
+                    // show方法会给DOM添加行内样式display：inline，需要单独设置css样式
+                }
             }
-
-        }
-
-
-
-    },
-    complete: function (xhr) {
-        // xhr当前请求xhr实例化  原生的东西
-        let obj = JSON.parse(xhr.responseText);
-        if (obj.status == 1 && obj.message == "身份认证失败！") {
-            // 1、回到login.html
-            location.href = '/login.html';
-            // 2、同时清除过期token
-            localStorage.removeItem('token')
-        }
-    }
+        },
+        // 见common
 
 
-})
+    });
+}
+getInfo();
 
 
 
